@@ -1,24 +1,36 @@
-import './style.css'
-import javascriptLogo from './javascript.svg'
-import viteLogo from '/vite.svg'
-import { setupCounter } from './counter.js'
+async function getData(poke) {
+  try {
+    const response = await fetch("https://api.weather.gov", {
+      headers: {
+        "User-Agent": "student-project",
+      },
+    });
 
-document.querySelector('#app').innerHTML = `
-  <div>
-    <a href="https://vite.dev" target="_blank">
-      <img src="${viteLogo}" class="logo" alt="Vite logo" />
-    </a>
-    <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript" target="_blank">
-      <img src="${javascriptLogo}" class="logo vanilla" alt="JavaScript logo" />
-    </a>
-    <h1>Hello Vite!</h1>
-    <div class="card">
-      <button id="counter" type="button"></button>
-    </div>
-    <p class="read-the-docs">
-      Click on the Vite logo to learn more
-    </p>
-  </div>
-`
+    if (response.status != 200) {
+      throw new Error(`HTTP error: ${response.status}`);
+    } else {
+      const data = await response.json();
 
-setupCounter(document.querySelector('#counter'))
+      console.log({
+        timestamp: new Date().toISOString(),
+        endpoint: "https://api.weather.gov",
+        status: response.status,
+        success: true,
+      });
+
+      console.log(data);
+
+      document.getElementById("api-response").textContent =
+        "Weather API connected successfully";
+    }
+  } catch (error) {
+    console.error({
+      timestamp: new Date().toISOString(),
+      endpoint: "https://api.weather.gov",
+      success: false,
+      error: error.message,
+    });
+  }
+}
+
+getData();

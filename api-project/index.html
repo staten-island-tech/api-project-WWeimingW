@@ -1,16 +1,30 @@
-<!doctype html>
-<html>
+<!DOCTYPE html>
+<html lang="en">
 
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link href="/src/style.css" rel="stylesheet">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Weather Dashboard</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/daisyui@3.36.0/dist/full.js"></script>
+  <script type="module" src="/main.js"></script>
 </head>
 
-<body class="bg-red-500">
-  <h1 class="text-3xl font-bold underline">
-    Hello world!
-  </h1>
+<body class="bg-gradient-to-br from-sky-100 to-indigo-200 min-h-screen flex items-center justify-center p-4">
+  <main class="card w-full max-w-lg bg-base-100 shadow-2xl rounded-xl overflow-hidden">
+    <div class="bg-blue-500 text-white p-6 text-center">
+      <h1 class="text-3xl font-bold">🌤 Weather Dashboard</h1>
+      <p class="mt-1 text-sm opacity-80">Check the current weather of your city</p>
+    </div>
+    <div class="card-body">
+      <form id="weather-form" class="flex flex-col sm:flex-row gap-3">
+        <input id="city-input" type="text" placeholder="Type a city (New York, London)"
+          class="input input-bordered w-full flex-1" />
+        <button type="submit" class="btn btn-primary w-full sm:w-auto">Search</button>
+      </form>
+      <div id="weather-output" class="mt-6 p-4 rounded-lg bg-base-200 shadow-inner text-center text-gray-700 text-lg"
+        aria-live="polite">
+  </main>
 </body>
 
 </html>

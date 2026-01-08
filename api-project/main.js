@@ -1,57 +1,62 @@
 const app = {
-  cities: [
-    { name: "new york", lat: 40.71, lon: -74.01 },
-    { name: "london", lat: 51.51, lon: -0.13 },
-    { name: "tokyo", lat: 35.68, lon: 139.69 },
-    { name: "paris", lat: 48.85, lon: 2.35 },
-  ],
-
   form: document.getElementById("weather-form"),
   input: document.getElementById("city-input"),
   output: document.getElementById("weather-output"),
 
-  async getWeather(lat, lon) {
-    try {
-      const response = await fetch(
-        `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current_weather=true&timezone=auto`
-      );
+  async getCity(cityName) {
+    const response = await fetch(
+      `https://geocoding-api.open-meteo.com/v1/search?name=${cityName}&count=1`
+    );
 
-      if (!response.ok) {
-        throw new Error("API request failed");
-      }
-      const data = await response.json();
-      const weather = data.current_weather;
-      this.output.textContent =
-        `Temperature: ${weather.temperature}C | ` +
-        `Wind Speed: ${weather.windspeed} km/h`;
+    if (!response.ok) {
+      throw new Error("City lookup failed try again later");
+    }
+    const data = await response.json();
+    if (!data.results || data.results.length === 0) {
+      throw new Error("City not found");
+    }
+    return data.results[0];
+  },
+
+  async getWeather(lat, lon) {
+    const response = await fetch(
+      `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current_weather=true&timezone=auto`
+    );
+    if (!response.ok) {
+      throw new Error("Weather request failed");
+    }
+    return response.json();
+  },
+  async Search(event) {
+    event.preventDefault();
+    const userCity = app.input.value.trim();
+    if (!userCity) {
+      app.output.innerHTML = `<p class="text-red-500">Please enter a city name.</p>`;
+      return;
+    }
+    try {
+      app.output.innerHTML = `<p>Loading weather...</p>`;
+      const city = await app.getCity(userCity);
+      const weatherData = await app.getWeather(city.latitude, city.longitude);
+      const weather = weatherData.current_weather;
+      app.output.innerHTML = `
+        <div class="text-xl font-bold">
+          ${city.name}
+        </div>
+        <div>
+          Temperature: ${weather.temperature}C
+        </div>
+        <div class="text-gray-600">
+          Wind Speed: ${weather.windspeed} km/h
+        </div>
+      `;
     } catch (error) {
       console.error(error);
-      this.output.textContent =
-        "Unable to load weather data. Please try again.";
+      app.output.innerHTML = `<p class="text-red-500">City not found or API error.</p>`;
     }
   },
-  loadDefaultWeather() {
-    const defaultCity = this.cities[0];
-    this.getWeather(defaultCity.lat, defaultCity.lon);
-  },
-
-  Search(event) {
-    event.preventDefault();
-    const userCity = app.input.value.trim().toLowerCase();
-    if (!userCity) {
-      app.output.textContent = "Please enter a city name.";
-      return;
-    }
-    const selectedCity = app.cities.find((city) => city.name === userCity);
-    if (!selectedCity) {
-      app.output.textContent = "City not found. Try New York or London.";
-      return;
-    }
-    app.getWeather(selectedCity.lat, selectedCity.lon);
-  },
-  init() {
-    this.loadDefaultWeather();
+  go() {
     this.form.addEventListener("submit", this.Search);
   },
 };
-app.init();
+app.go();

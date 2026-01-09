@@ -7,7 +7,6 @@ const app = {
     const response = await fetch(
       `https://geocoding-api.open-meteo.com/v1/search?name=${cityName}&count=1`
     );
-
     if (!response.ok) {
       throw new Error("City lookup failed try again later");
     }
@@ -17,7 +16,6 @@ const app = {
     }
     return data.results[0];
   },
-
   async getWeather(lat, lon) {
     const response = await fetch(
       `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current_weather=true&timezone=auto`
@@ -27,6 +25,16 @@ const app = {
     }
     return response.json();
   },
+  render(city, weather) {
+    app.output.innerHTML = `
+      <div class="text-xl font-bold">
+        ${city.name}
+      </div>
+      <div> Temperature: ${weather.temperature}C </div>
+      <div class="text-gray-600"> Wind Speed: ${weather.windspeed} km/h </div>
+    `;
+  },
+
   async Search(event) {
     event.preventDefault();
     const userCity = app.input.value.trim();
@@ -34,29 +42,32 @@ const app = {
       app.output.innerHTML = `<p class="text-red-500">Please enter a city name.</p>`;
       return;
     }
+
     try {
       app.output.innerHTML = `<p>Loading weather...</p>`;
       const city = await app.getCity(userCity);
-      const weatherData = await app.getWeather(city.latitude, city.longitude);
-      const weather = weatherData.current_weather;
-      app.output.innerHTML = `
-        <div class="text-xl font-bold">
-          ${city.name}
-        </div>
-        <div>
-          Temperature: ${weather.temperature}C
-        </div>
-        <div class="text-gray-600">
-          Wind Speed: ${weather.windspeed} km/h
-        </div>
-      `;
+      [city].map(async (c) => {
+        const weatherData = await app.getWeather(c.latitude, c.longitude);
+        app.render(c, weatherData.current_weather);
+      });
     } catch (error) {
       console.error(error);
       app.output.innerHTML = `<p class="text-red-500">City not found or API error.</p>`;
     }
   },
+  async loadDefault() {
+    try {
+      const city = await app.getCity("New York");
+      const weatherData = await app.getWeather(city.latitude, city.longitude);
+      app.render(city, weatherData.current_weather);
+    } catch (error) {
+      console.error(error);
+    }
+  },
   go() {
     this.form.addEventListener("submit", this.Search);
+    this.loadDefault();
   },
 };
+
 app.go();

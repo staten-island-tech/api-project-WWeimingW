@@ -180,4 +180,3 @@ videoGames
         document
             .querySelector(".games")
             .insertAdjacentHTML("afterbegin", `<h2>${game.title}</h2>`));
-

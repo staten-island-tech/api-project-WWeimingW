@@ -44,15 +44,15 @@ const app = {
     }
 
     try {
-      app.output.innerHTML = `<p>Loading weather...</p>`;
+      app.output.innerHTML = `<p>Loading weatheringinginginging...</p>`;
       const city = await app.getCity(userCity);
       [city].map(async (c) => {
         const weatherData = await app.getWeather(c.latitude, c.longitude);
         app.render(c, weatherData.current_weather);
       });
     } catch (error) {
-      console.error(error);
-      app.output.innerHTML = `<p class="text-red-500">City not found or API error.</p>`;
+      console.log(error);
+      app.output.innerHTML = `<p class="text-red-500">City not found or API error try asking vincent.</p>`;
     }
   },
   async loadDefault() {
@@ -61,7 +61,7 @@ const app = {
       const weatherData = await app.getWeather(city.latitude, city.longitude);
       app.render(city, weatherData.current_weather);
     } catch (error) {
-      console.error(error);
+      console.log(error);
     }
   },
   go() {

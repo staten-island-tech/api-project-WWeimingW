@@ -151,32 +151,172 @@ const videoGames = [
   },
 ];
 
-const publishers = {nintendo: 1};
-
-videoGames.forEach((game) => {
-    let studio = game.studio
-    if(!publishers[studio]){
-        publishers[studio] = 1;
-    } else {
-        publishers[studio] = publishers[studio] + 1;
-    }
-});
-for (let publisher in publishers){
-    const publishDiv = document.querySelector(".publisher");
-    publishDiv.insertAdjacentHTML(
-        "afterbegin",
-        `
-        <div class="publisher-container">
-        <h3 class ="publisher>${publisher}<h2/>
-        <h3 class="amount>${}</h3>
-        </div>
-        `
-    )
-}
-
+// metacritics 
 videoGames
-    .filter((game)=> game.ratings.metacritic > 95)
+    .filter((game) => game.ratings.metacritic > 96)
     .forEach((game) => 
         document
             .querySelector(".games")
-            .insertAdjacentHTML("afterbegin", `<h2>${game.title}</h2>`));
+            .insertAdjacentHTML("afterbegin", `<h2>${game.title}</h2>`))
+
+//logs each game into a seperate array
+const publishers = {};
+
+videoGames.forEach((game) => {
+  let studio = game.studio;
+  if (!publishers[studio]) {
+    publishers[studio] = 1;
+  } else {
+    publishers[studio] += 1;
+  }
+});
+
+// Display all studios with their game counts
+const publishersDiv = document.querySelector(".publishers");
+
+for (let studio in publishers) {
+  publishersDiv.insertAdjacentHTML(
+    "beforeend",
+    `<div class="publisher-container">
+      <h3 class="publisher">${studio}</h3>
+      <p class="amount">Games: ${publishers[studio]}</p>
+    </div>`
+  );
+}
+
+// Find studio with the most games
+let topStudio = "";
+let maxGames = 0;
+
+for (let studio in publishers) {
+  if (publishers[studio] > maxGames) {
+    maxGames = publishers[studio];
+    topStudio = studio;
+  }
+}
+
+// Display studio with the most games
+const topStudioDiv = document.querySelector(".top-studio");
+topStudioDiv.innerHTML = `<h3>${topStudio} (${maxGames} games)</h3>`;
+
+
+
+
+let oldestGame = videoGames[0]; // start with the first game
+
+videoGames.forEach((game) => {
+  if (game.yearReleased < oldestGame.yearReleased) {
+    oldestGame = game; // update if we find an older game
+  }
+});
+//display oldestgame title and year
+document.querySelector(".games").insertAdjacentHTML(
+  "beforeend",
+  `<h3>Oldest Game: ${oldestGame.title} (${oldestGame.yearReleased})</h3>`
+);
+
+
+
+let newestGame = videoGames[0]; // start with the first game
+
+videoGames.forEach((game) => {
+  if (game.yearReleased > newestGame.yearReleased) {
+    newestGame = game; // update if we find a newer game
+  }
+});
+
+document.querySelector(".games").insertAdjacentHTML(
+  "beforeend",
+  `<h3>Newest Game: ${newestGame.title} (${newestGame.yearReleased})</h3>`
+);
+
+
+// average rating of all games
+let total = 0;
+
+videoGames.forEach((game) => {
+  total += (game.ratings.metacritic + game.ratings.igdb) / 2;
+});
+
+let averageAllGames = total / videoGames.length;
+
+document.querySelector(".games").insertAdjacentHTML(
+  "beforeend",
+  `<h3>Average Rating of All Games: ${averageAllGames.toFixed(2)}</h3>`
+);
+
+//average rating of a studio 
+let studioName = "Nintendo"; // change to any studio
+let totalStudio = 0;
+let countStudio = 0;
+
+videoGames.forEach((game) => {
+  if (game.studio === studioName) {
+    totalStudio += (game.ratings.metacritic + game.ratings.igdb) / 2;
+    countStudio++;
+  }
+});
+
+let averageStudio = totalStudio / countStudio;
+
+document.querySelector(".games").insertAdjacentHTML(
+  "beforeend",
+  `<h3>Average Rating of ${studioName}: ${averageStudio.toFixed(2)}</h3>`
+);
+
+
+//shows all games a studio has
+const studioNames = "Nintendo"; // e.g., "Rockstar Games", "Mojang Studios"
+
+// Filter games by studio
+const studioGames = videoGames.filter(game => game.studio === studioName);
+
+// Select the div where results will go
+const studioDiv = document.querySelector(".games");
+
+// Add a title
+studioDiv.insertAdjacentHTML("beforeend", `<h3>Games by ${studioName}:</h3>`);
+
+// List each game
+studioGames.forEach(game => {
+  studioDiv.insertAdjacentHTML("beforeend", `<p>${game.title}</p>`);
+});
+
+
+// games listed before 2015
+const oldGames = videoGames.filter(game => game.yearReleased < 2015);
+
+const oldDiv = document.querySelector(".games");
+oldDiv.insertAdjacentHTML("beforeend","<h3>Games Released Before 2015:</h3>");
+
+oldGames.forEach(game => {
+  oldDiv.insertAdjacentHTML("beforeend", `<p>${game.title} (${game.yearReleased})</p>`);
+});
+
+
+//all actionrpg games
+const actionRPGGames = videoGames.filter(game => game.genre.includes("Action RPG"));
+
+const rpgDiv = document.querySelector(".games");
+rpgDiv.insertAdjacentHTML("beforeend", "<h3>Action RPG Games:</h3>");
+
+actionRPGGames.forEach(game => {
+  rpgDiv.insertAdjacentHTML("beforeend", `<p>${game.title}</p>`);
+});
+
+let genreName = "Action RPG"; // Change this to "Action", "Shooter", "Platformer", etc.
+
+// Filter games that include the genre
+const genreGames = videoGames.filter(game => game.genre.includes(genreName));
+
+// Select the div where results will go
+const genreDiv = document.querySelector(".games");
+
+// Add a title
+genreDiv.insertAdjacentHTML("beforeend", `<h3>Games in genre: ${genreName}</h3>`);
+
+// List each game
+genreGames.forEach(game => {
+  genreDiv.insertAdjacentHTML("beforeend", `<p>${game.title}</p>`);
+});
+>>>>>>> 56bda4520cc0182487eff427b7401d8b53cf368d
